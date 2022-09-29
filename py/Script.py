@@ -3,16 +3,42 @@ import json
 from typing import List
 
 class OperationData:
-    def __init__(self, objectKeyList, objectValueList):
-        self.keys = objectKeyList
+    propertyNames = ['values', 'date', 'card', 'account', 'accountValidTo', 'client', 'lastName',
+                        'firstName', 'patronymic', 'dateOfBirth', 'passport', 'passportValidTo', 'phone', 
+                        'operType', 'amount', 'operResult', 'terminal', 'terminalType', 'city', 'address']
+    def __init__(self, objectValueList):
         self.values = objectValueList
-        for i in range(len(key)):
-            try: 
-                exec("%s = %s" % (self.keys[i], self.values[i]))
-            except:
-                pass
-            
-            # self[objectKeyList[i]] = objectValueList[i] 
+        self.date = ''
+        self.card = ''
+        self.account = ''
+        self.accountValidTo = ''
+        self.client = ''
+        self.lastName = ''
+        self.firstName = ''
+        self.patronymic = ''
+        self.dateOfBirth = ''
+        self.passport = ''
+        self.passportValidTo = ''
+        self.phone = ''
+        self.operType = ''
+        self.amount = ''
+        self.operResult = ''
+        self.terminal = ''
+        self.terminalType = ''
+        self.city = ''
+        self.address = ''
+    def set_data(self, array):
+        if len(array) != len(OperationData.propertyNames):
+            raise ValueError("Bad data length")
+        for i in range(len(array)):
+            value = array[i]
+            if value is not None: 
+                key = OperationData.propertyNames[i]
+                setattr(self, key, value)
+    def __str__(self):
+        return "OperationData(%s)" % ','.join([str(getattr(self, key)) for key in OperationData.propertyNames])
+    def __repr__(self):
+        return str(self)
 
             
         
@@ -28,11 +54,12 @@ for numberObj, DataObject in enumerate(jsonObject["transactions"]):
     for key in jsonObject["transactions"][DataObject]:
         objectKeyList.append(key)
         objectValueList.append(jsonObject["transactions"][DataObject][key])
-        # print(key, jsonObject["transactions"][DataObject][key]) 
-    objectsList.append(OperationData(objectKeyList, objectValueList))
+        print(key, jsonObject["transactions"][DataObject][key]) 
+    objectsList.append(OperationData(objectValueList))
     break
-for key, value in objectsList[0].items():
-    print(key, value)
+print(objectsList)
+
+
 
 
 
