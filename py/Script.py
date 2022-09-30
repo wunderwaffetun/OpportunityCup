@@ -40,14 +40,16 @@ def readJsonFile(objectsList = []):
     jsonFile.close()
     return objectsList
 
+def objToJson(object):
+    JSON = json.dumps(object.toJSON())
+    JSON = re.sub(r',', lambda o: ',\n', str(object))
+    return (JSON + '\r\n')
+
 def globalFilters(objectsList):
     with open('./testFile.txt', 'w+', encoding = 'utf-8') as output:
-        counter = 0
         for object in objectsList:
             if object.operResult == 'Отказ':
-                JSON = json.dumps(object.toJSON())
-                JSON = re.sub(r',', lambda o: ',\n', str(object))
-                output.write(JSON + '\r\n')
+                output.write(objToJson(object))
 
 
 def __main__():
