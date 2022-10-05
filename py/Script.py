@@ -51,7 +51,7 @@ def repeatCard(objectsList):
 def outputDictTerminal(dict):
     for key, value in dict.items():
         if(len(value) > 1):
-            print( '\n\n', 'Количество повторяющихся операций:', len(value), '\n\n', '----------next-------------')
+            print( '\n\n', '----------next-------------', '\n\n', 'Количество повторяющихся операций:', len(value))
             for operation in value:
                 print('\n')
                 for item, val in operation.__dict__.items():
