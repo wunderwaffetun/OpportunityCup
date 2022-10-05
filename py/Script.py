@@ -2,8 +2,8 @@ import os
 import json
 import re
 import datetime
-from symbol import decorated
 # from filtersFunc import globalFilters
+
 minYearPas = 1996 #c 97 выдача паспорта РФ
 maxYearPas = 2023 #год из серии не превышает нынешний
 maxAge = 100
