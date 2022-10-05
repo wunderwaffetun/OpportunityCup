@@ -12,7 +12,7 @@ class OperationData:
                         'firstName', 'patronymic', 'dateOfBirth', 'passport', 'passportValidTo', 'phone', 
                         'operType', 'amount', 'operResult', 'terminal', 'terminalType', 'city', 'address']
     def __init__(self, objectValueList):
-        self._rank = 20
+        self._rank = 50
         if len(objectValueList) != len(OperationData.propertyNames):
             raise ValueError("Bad data length")
         for i in range(len(objectValueList)):
@@ -24,6 +24,8 @@ class OperationData:
         return json.dumps(self, default = lambda o: f"{o.__dict__}", indent = 2)
     def set_rank(self, rank):
         self._rank = rank
+    def get_properties_name(self): 
+        return self.propertyNames
     def get_rank(self):
         return self._rank
     def __str__(self):
@@ -34,7 +36,7 @@ class OperationData:
 
 
 def readJsonFile(objectsList = []):
-    jsonFile = open(f'{os.path.dirname(os.getcwd())}/transactions.json', encoding='utf-8')
+    jsonFile = open(f'{os.path.dirname(os.getcwd())}/testdata.json', encoding='utf-8')
     jsonObject = json.load(jsonFile)
     for numberObj, DataObject in enumerate(jsonObject["transactions"]):
         objectValueList = []
@@ -66,6 +68,19 @@ def objToJson(object):
     JSON = json.dumps(object.toJSON())
     JSON = re.sub(r',', lambda o: ',\n', str(object))
     return (JSON + '\r\n')
+
+def findAndReduceByParametr(objectsList, **kwargs): #чисто для фрода, можно поправить уменьшаемое значение (4 пункт)
+    print(kwargs)
+    for key in kwargs.keys(): 
+        if key not in objectsList[0].get_properties_name():
+            raise ValueError("There are no such parametr or parametrs P.S. findAndReduceByParametr()")
+    for object in objectsList:
+        for property, value in kwargs.items():
+            if getattr(object, property) == value:
+                reduceRank(object, 30)
+        print(object.get_rank())
+
+
 
 def reduceRank(object, quantity): #универсальная функция, уменьшающая приоритетность операции
     #Здесь мы смотрим на operResult, это нужно, чтобы, например, если человек забыл, что просрочился
@@ -128,13 +143,13 @@ def impossibleValues(object):
     if(yearFromPass < minYearPas or
         yearFromPass > maxYearPas or                          # несуществующая серия паспорта
         ageClient < 14 or                                    # ранняя выдача паспорта
-        ageCalculateFromPas < 11 or
-        ageClient > maxAge):                           # слишком молод для своей серии
+        ageCalculateFromPas < 11 or                          # слишком молод для своей серии
+
+        ageClient > maxAge):                           
         reduceRank(object, 5)
 
     if (object.date > object.accountValidTo or object.date > object.passportValidTo):
         reduceRank(object, 10)
-
 
 
 
@@ -143,6 +158,7 @@ def globalFilters(objectsList):
         if object.get_rank() > 0: #если у нас уже есть в базе фрод, не будем запускать
             impossibleValues(object)
         print(object.get_rank()) if (object.get_rank() < 20) else object
+    findAndReduceByParametr(objectsList, card = "56037470176508885939", client = "8-44184") #проверка 4 пункта
     # with open('./testFile.txt', 'w+', encoding = 'utf-8') as output:
     #     for object in objectsList:
     #         if object.operResult == 'Отказ':
