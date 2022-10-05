@@ -4,7 +4,9 @@ import re
 import datetime
 from symbol import decorated
 # from filtersFunc import globalFilters
-
+minYearPas = 1996 #c 97 выдача паспорта РФ
+maxYearPas = 2023 #год из серии не превышает нынешний
+maxAge = 100
 class OperationData:
     propertyNames = ['date', 'card', 'account', 'accountValidTo', 'client', 'lastName',
                         'firstName', 'patronymic', 'dateOfBirth', 'passport', 'passportValidTo', 'phone', 
@@ -65,8 +67,14 @@ def objToJson(object):
     JSON = re.sub(r',', lambda o: ',\n', str(object))
     return (JSON + '\r\n')
 
-def reduceRank(object, quantity): #универсальная функция, уменьшающая приоритетность операции 
-    object.set_rank(object.get_rank()-quantity)
+def reduceRank(object, quantity): #универсальная функция, уменьшающая приоритетность операции
+    #Здесь мы смотрим на operResult, это нужно, чтобы, например, если человек забыл, что просрочился
+    #аккаунт, его рейтинг не улетал в 0, однако если он пытается это делать постоянно, постепенно рейтинг снижается
+    if(object.operResult != "Отказ"):
+        object.set_rank(object.get_rank() - quantity)
+    else:
+        object.set_rank(object.get_rank() - 1)
+
 
 def strToTime(strTime): #универсальная функция, переводит строку во время
     return datetime.datetime.strptime(strTime, "%H:%M:%S").time()
@@ -99,17 +107,36 @@ def changeObjDates(list): #нужна для переопределения ст
 
 def impossibleValues(object):
     yearFromPass = int(f"{object.passport}"[2:4]) #выяснили год пасспорта
-    yearFromBirth = int(f"{object.dateOfBirth}"[0:4]) 
+    if (yearFromPass > 23):
+        yearFromPass = int("19"+f"{object.passport}"[2:4])
+    else:
+        yearFromPass = int("20"+f"{object.passport}"[2:4])
     terminal = object.terminal[0:3]
+    ageClient = object.date.year - object.dateOfBirth.year #реальный возраст клиента на момент итерации с банком
+    ageCalculateFromPas = yearFromPass - object.dateOfBirth.year #возраст клиента на момент получения паспорта
+
 
     if(terminal == "POS" and object.operType == "Пополнение"):#пополнение через POS
         reduceRank(object, 2) 
 
-    if(((object.date.time() >= strToTime("22:00:00")) and 
+    if(((object.date.time() >= strToTime("22:00:00")) and #ночное время
         (object.date.time() <= strToTime("23:59:59"))) or
         ((object.date.time() >= strToTime("00:00:00")) and
         (object.date.time() <= strToTime("06:00:00")))):
-            reduceRank(object, 1)
+        reduceRank(object, 1)
+
+    if(yearFromPass < minYearPas or
+        yearFromPass > maxYearPas or                          # несуществующая серия паспорта
+        ageClient < 14 or                                    # ранняя выдача паспорта
+        ageCalculateFromPas < 11 or
+        ageClient > maxAge):                           # слишком молод для своей серии
+        reduceRank(object, 5)
+
+    if (object.date > object.accountValidTo or object.date > object.passportValidTo):
+        reduceRank(object, 10)
+
+
+
 
 def globalFilters(objectsList):
     for object in objectsList: 
@@ -123,12 +150,13 @@ def globalFilters(objectsList):
 
 
 def __main__():
+
     objectsList = readJsonFile([])  #получаем список json объектов
     changeObjDates(objectsList) #заменяем строковые даты на объекты дат
     globalFilters(objectsList) #основная фильтрующая функция
     repeatCards = repeatCard(objectsList) #получаем список словарей с уникальными ключами в виде номеров карт
     # outputDictTerminal(repeatCards)
-        
+
 
 
 __main__()
