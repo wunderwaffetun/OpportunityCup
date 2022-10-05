@@ -1,6 +1,9 @@
 import os
 import json
 import re
+import datetime
+from symbol import decorated
+# from filtersFunc import globalFilters
 
 class OperationData:
     propertyNames = ['date', 'card', 'account', 'accountValidTo', 'client', 'lastName',
@@ -62,19 +65,70 @@ def objToJson(object):
     JSON = re.sub(r',', lambda o: ',\n', str(object))
     return (JSON + '\r\n')
 
+def reduceRank(object, quantity): #универсальная функция, уменьшающая приоритетность операции 
+    object.set_rank(object.get_rank()-quantity)
+
+def strToTime(strTime): #универсальная функция, переводит строку во время
+    return datetime.datetime.strptime(strTime, "%H:%M:%S").time()
+
+def tryExceptDecorator(): #дописать декоратор для changeObjDates()
+    def _wrapper(returnDate):
+        try: 
+            return datetime.datetime.strptime(returnDate, "%Y-%m-%dT%H:%M:%S")
+        except:
+            return datetime.datetime.strptime(returnDate, "%Y-%m-%d")
+    return _wrapper
+
+
+def changeObjDates(list): #нужна для переопределения строк в объекте на объект даты
+    for object in list:
+        object.date = datetime.datetime.strptime(object.date, "%Y-%m-%dT%H:%M:%S")
+        # exit() # тут дописать декоратор
+        try:
+            object.passportValidTo = datetime.datetime.strptime(object.passportValidTo, "%Y-%m-%dT%H:%M:%S")
+        except:
+            object.passportValidTo = datetime.datetime.strptime(object.passportValidTo, "%Y-%m-%d")
+        try:
+            object.dateOfBirth = datetime.datetime.strptime(object.dateOfBirth, "%Y-%m-%dT%H:%M:%S")
+        except:
+            object.dateOfBirth = datetime.datetime.strptime(object.dateOfBirth, "%Y-%m-%d")
+        try:
+            object.accountValidTo = datetime.datetime.strptime(object.accountValidTo, "%Y-%m-%dT%H:%M:%S")
+        except: 
+            object.accountValidTo = datetime.datetime.strptime(object.accountValidTo, "%Y-%m-%d")
+
+def impossibleValues(object):
+    yearFromPass = int(f"{object.passport}"[2:4]) #выяснили год пасспорта
+    yearFromBirth = int(f"{object.dateOfBirth}"[0:4]) 
+    terminal = object.terminal[0:3]
+
+    if(terminal == "POS" and object.operType == "Пополнение"):#пополнение через POS
+        reduceRank(object, 2) 
+
+    if(((object.date.time() >= strToTime("22:00:00")) and 
+        (object.date.time() <= strToTime("23:59:59"))) or
+        ((object.date.time() >= strToTime("00:00:00")) and
+        (object.date.time() <= strToTime("06:00:00")))):
+            reduceRank(object, 1)
+
 def globalFilters(objectsList):
-    with open('./testFile.txt', 'w+', encoding = 'utf-8') as output:
-        for object in objectsList:
-            if object.operResult == 'Отказ':
-                output.write(objToJson(object))
+    for object in objectsList: 
+        if object.get_rank() > 0: #если у нас уже есть в базе фрод, не будем запускать
+            impossibleValues(object)
+        print(object.get_rank()) if (object.get_rank() < 20) else object
+    # with open('./testFile.txt', 'w+', encoding = 'utf-8') as output:
+    #     for object in objectsList:
+    #         if object.operResult == 'Отказ':
+    #             output.write(objToJson(object))
 
 
 def __main__():
-    objectsList = readJsonFile([])
-    globalFilters(objectsList)
-    repeatCards = repeatCard(objectsList)
-    outputDictTerminal(repeatCards)
+    objectsList = readJsonFile([])  #получаем список json объектов
+    changeObjDates(objectsList) #заменяем строковые даты на объекты дат
+    globalFilters(objectsList) #основная фильтрующая функция
+    repeatCards = repeatCard(objectsList) #получаем список словарей с уникальными ключами в виде номеров карт
+    # outputDictTerminal(repeatCards)
         
-    
+
 
 __main__()
