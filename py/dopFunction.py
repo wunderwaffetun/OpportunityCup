@@ -14,6 +14,8 @@ def repeatCard(objectsList):
             sameCards[object.card].append(object)
     return sameCards
 
+
+
 def outputDictTerminal(dict):
     for key, value in dict.items():
         if(len(value) >= 1):
@@ -45,7 +47,8 @@ def reduceRank(object, quantity): #универсальная функция, у
         object.set_rank(object.get_rank() - quantity)
     else:
         object.set_rank(object.get_rank() - penaltyForRejectionAndFrod)
-
+    if object.get_rank() < 0:
+        object.set_rank(0)
 def strToTime(strTime): #универсальная функция, переводит строку во время
     return datetime.datetime.strptime(strTime, "%H:%M:%S").time()
 

@@ -5,14 +5,16 @@ from const import *
 from readJSON import *
 from dopFunction import *
 from Script import *
-
+from frodForPas import *
 def globalFilters(objectsList):
     repeatCards = repeatCard(objectsList) #получаем список словарей с уникальными ключами в виде номеров карт
+    repeatPassports = repeatPassport(objectsList)
     for object in objectsList:
         if object.get_rank() > 0: #если у нас уже есть в базе фрод, не будем запускать
             impossibleValues(object)
             manyCache(object)
     suspiciouslyDeals(repeatCards)
+    suspiciouslyDealsTwo(repeatPassports)
     checkCorreckDataObject(objectsList, repeatCards)
 
 def findAndReduceByParametr(objectsList, **kwargs): #чисто для фрода, можно поправить уменьшаемое значение (4 пункт)
@@ -22,7 +24,7 @@ def findAndReduceByParametr(objectsList, **kwargs): #чисто для фрод�
             raise ValueError("There are no such parametr or parametrs P.S. findAndReduceByParametr()")
     for prop, value in kwargs.items():
         for object in objectsList:
-            print(object)
+            #print(object)
             if getattr(object, prop) == value:
                 object.set_rank(0)
 
@@ -43,14 +45,14 @@ def checkCorreckDataObject(objectsList, repeatCards): #1 пункт
                 listOfCurrentParametrs = [object.passport, f"{object.lastName}{object.firstName}{object.patronymic}",
                                             object.passportValidTo, object.accountValidTo, object.account,
                                             object.client, object.dateOfBirth]
-                if listOfCurrentParametrs != listOfParametrs:
-                    findAndReduceByParametr(objectsList, card = object.card, passport = object.passport, lastName = object.lastName,
-                                            firstName = object.firstName, patronymic = object.patronymic,
-                                            passportValidTo = object.passportValidTo, accountValidTo = object.accountValidTo,
-                                            account = object.account, client = object.client, dateOfBirth = object.dateOfBirth)
+                # if listOfCurrentParametrs != listOfParametrs:
+                #     findAndReduceByParametr(objectsList, card = object.card, passport = object.passport, lastName = object.lastName,
+                #                             firstName = object.firstName, patronymic = object.patronymic,
+                #                             passportValidTo = object.passportValidTo, accountValidTo = object.accountValidTo,
+                #                             account = object.account, client = object.client, dateOfBirth = object.dateOfBirth)
 def impossibleValues(object):
     yearFromPass = int(f"{object.passport}"[2:4]) #выяснили год пасспорта
-    if (yearFromPass > nowYear):
+    if (yearFromPass > NextYear):
         yearFromPass = int("19"+f"{object.passport}"[2:4])
     else:
         yearFromPass = int("20"+f"{object.passport}"[2:4])
@@ -99,7 +101,7 @@ def suspiciouslyDeals(repeatCards): # 3 и более смены мест + пр
                 # print(object.city, object.date, object.amount, object.terminal[0:3], object.operType, str(timeDifference), isSameOperation)
 
             if (isToOften and isSameOperation):
-                reduceRank(object, penaltyForSameOftenOperation) #вектор не уточнён, требуется доработка, потенциальный фрод, при уточнении, недостаточноть входных данных
+                reduceRank(object, penaltyForSameOftenOperationCart) #вектор не уточнён, требуется доработка, потенциальный фрод, при уточнении, недостаточноть входных данных
             if len(visitedCities) > limitCountVisitedCities:
                 reduceRank(object, penaltyForVisetedCities)
             #print('-----------------------next---------------------------')
