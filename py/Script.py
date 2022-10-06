@@ -10,5 +10,4 @@ if __name__ == '__main__':
     objectsList = readJsonFile([])  #получаем список json объектов
     changeObjDates(objectsList) #заменяем строковые даты на объекты дат
     globalFilters(objectsList) #основная фильтрующая функция
-    for object in objectsList:
-        print(object.get_rank())
+    

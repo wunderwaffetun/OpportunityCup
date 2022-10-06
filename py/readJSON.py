@@ -10,7 +10,8 @@ class OperationData:
     propertyNames = ['date', 'card', 'account', 'accountValidTo', 'client', 'lastName',
                         'firstName', 'patronymic', 'dateOfBirth', 'passport', 'passportValidTo', 'phone',
                         'operType', 'amount', 'operResult', 'terminal', 'terminalType', 'city', 'address']
-    def __init__(self, objectValueList):
+    def __init__(self, objectValueList, number):
+        self._numberOperation = number
         self._rank = rank
         if len(objectValueList) != len(OperationData.propertyNames):
             raise ValueError("Bad data length")
@@ -19,6 +20,8 @@ class OperationData:
             if value is not None:
                 key = OperationData.propertyNames[i]
                 setattr(self, key, value)
+    def get_number(self):
+        return self._numberOperation
     def toJSON(self):
         return json.dumps(self, default = lambda o: f"{o.__dict__}", indent = 2)
     def set_rank(self, rank):
@@ -33,14 +36,13 @@ class OperationData:
         return str(self)
 
 def readJsonFile(objectsList = []):
-    #jsonFile = open(f'{os.path.dirname(os.getcwd())}/transactions.json', encoding='utf-8')
-    jsonFile = open(f'{os.path.dirname(os.getcwd())}/testdata.json', encoding='utf-8')
+    jsonFile = open(f'{os.path.dirname(os.getcwd())}/transactions.json', encoding='utf-8')
     jsonObject = json.load(jsonFile)
     for numberObj, DataObject in enumerate(jsonObject["transactions"]):
         objectValueList = []
         for key in jsonObject["transactions"][DataObject]:
             objectValueList.append(jsonObject["transactions"][DataObject][key])
-        objectsList.append(OperationData(objectValueList))
+        objectsList.append(OperationData(objectValueList, DataObject))
     jsonFile.close()
     return objectsList
 

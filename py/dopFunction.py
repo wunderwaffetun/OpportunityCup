@@ -14,6 +14,8 @@ def repeatCard(objectsList):
             sameCards[object.card].append(object)
     return sameCards
 
+
+
 def outputDictTerminal(dict):
     for key, value in dict.items():
         if(len(value) >= 1):
@@ -23,10 +25,7 @@ def outputDictTerminal(dict):
                 for item, val in operation.__dict__.items():
                     print(item, val)
 
-# def objToJson(object):
-#     JSON = json.dumps(object.toJSON())
-#     JSON = re.sub(r',', lambda o: ',\n', str(object))
-#     return (JSON + '\r\n')
+
 
 def findAndReduceByParametr(objectsList, **kwargs): #чисто для фрода, можно поправить уменьшаемое значение (4 пункт)
     #findAndReduceByParametr(objectsList, card = "56037470176508885939", client = "8-44184") #проверка 4 пункта
@@ -45,7 +44,8 @@ def reduceRank(object, quantity): #универсальная функция, у
         object.set_rank(object.get_rank() - quantity)
     else:
         object.set_rank(object.get_rank() - penaltyForRejectionAndFrod)
-
+    if object.get_rank() < 0:
+        object.set_rank(0)
 def strToTime(strTime): #универсальная функция, переводит строку во время
     return datetime.datetime.strptime(strTime, "%H:%M:%S").time()
 
