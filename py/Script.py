@@ -36,7 +36,7 @@ class OperationData:
 
 
 def readJsonFile(objectsList = []):
-    jsonFile = open(f'{os.path.dirname(os.getcwd())}/testdata.json', encoding='utf-8')
+    jsonFile = open(f'{os.path.dirname(os.getcwd())}/transactions.json', encoding='utf-8')
     jsonObject = json.load(jsonFile)
     for numberObj, DataObject in enumerate(jsonObject["transactions"]):
         objectValueList = []
@@ -57,7 +57,7 @@ def repeatCard(objectsList):
 
 def outputDictTerminal(dict):
     for key, value in dict.items():
-        if(len(value) > 1):
+        if(len(value) >= 1):
             print( '\n\n', '----------next-------------', '\n\n', 'Количество повторяющихся операций:', len(value))
             for operation in value:
                 print('\n')
@@ -70,7 +70,6 @@ def objToJson(object):
     return (JSON + '\r\n')
 
 def findAndReduceByParametr(objectsList, **kwargs): #чисто для фрода, можно поправить уменьшаемое значение (4 пункт)
-    print(kwargs)
     for key in kwargs.keys(): 
         if key not in objectsList[0].get_properties_name():
             raise ValueError("There are no such parametr or parametrs P.S. findAndReduceByParametr()")
@@ -78,7 +77,6 @@ def findAndReduceByParametr(objectsList, **kwargs): #чисто для фрод�
         for property, value in kwargs.items():
             if getattr(object, property) == value:
                 reduceRank(object, 30)
-        print(object.get_rank())
 
 
 
@@ -94,31 +92,20 @@ def reduceRank(object, quantity): #универсальная функция, у
 def strToTime(strTime): #универсальная функция, переводит строку во время
     return datetime.datetime.strptime(strTime, "%H:%M:%S").time()
 
-def tryExceptDecorator(): #дописать декоратор для changeObjDates()
-    def _wrapper(returnDate):
-        try: 
-            return datetime.datetime.strptime(returnDate, "%Y-%m-%dT%H:%M:%S")
-        except:
-            return datetime.datetime.strptime(returnDate, "%Y-%m-%d")
-    return _wrapper
+
+def tryExceptDecorator(handlingDataTime): #дописать декоратор для changeObjDates()
+    try: 
+        return datetime.datetime.strptime(handlingDataTime, "%Y-%m-%dT%H:%M:%S")
+    except:
+        return datetime.datetime.strptime(handlingDataTime, "%Y-%m-%d")
 
 
 def changeObjDates(list): #нужна для переопределения строк в объекте на объект даты
     for object in list:
         object.date = datetime.datetime.strptime(object.date, "%Y-%m-%dT%H:%M:%S")
-        # exit() # тут дописать декоратор
-        try:
-            object.passportValidTo = datetime.datetime.strptime(object.passportValidTo, "%Y-%m-%dT%H:%M:%S")
-        except:
-            object.passportValidTo = datetime.datetime.strptime(object.passportValidTo, "%Y-%m-%d")
-        try:
-            object.dateOfBirth = datetime.datetime.strptime(object.dateOfBirth, "%Y-%m-%dT%H:%M:%S")
-        except:
-            object.dateOfBirth = datetime.datetime.strptime(object.dateOfBirth, "%Y-%m-%d")
-        try:
-            object.accountValidTo = datetime.datetime.strptime(object.accountValidTo, "%Y-%m-%dT%H:%M:%S")
-        except: 
-            object.accountValidTo = datetime.datetime.strptime(object.accountValidTo, "%Y-%m-%d")
+        object.passportValidTo = tryExceptDecorator(object.passportValidTo)
+        object.dateOfBirth = tryExceptDecorator(object.dateOfBirth)
+        object.accountValidTo = tryExceptDecorator(object.accountValidTo)
 
 def impossibleValues(object):
     yearFromPass = int(f"{object.passport}"[2:4]) #выяснили год пасспорта
@@ -151,22 +138,25 @@ def impossibleValues(object):
     if (object.date > object.accountValidTo or object.date > object.passportValidTo):
         reduceRank(object, 10)
 
+def suspiciouslyDeals(object): 
+    if(object.operType == 'Снятие' and object.terminal[0:3] == "ATM" and object.amount > 20000): # если снимаем много налички
+        reduceRank(object, 7)
 
 
 def globalFilters(objectsList):
     for object in objectsList: 
         if object.get_rank() > 0: #если у нас уже есть в базе фрод, не будем запускать
             impossibleValues(object)
+            suspiciouslyDeals(object)
         print(object.get_rank()) if (object.get_rank() < 20) else object
-    findAndReduceByParametr(objectsList, card = "56037470176508885939", client = "8-44184") #проверка 4 пункта
+    #findAndReduceByParametr(objectsList, card = "56037470176508885939", client = "8-44184") #проверка 4 пункта
     # with open('./testFile.txt', 'w+', encoding = 'utf-8') as output:
     #     for object in objectsList:
     #         if object.operResult == 'Отказ':
     #             output.write(objToJson(object))
 
 
-def __main__():
-
+if __name__ == '__main__':
     objectsList = readJsonFile([])  #получаем список json объектов
     changeObjDates(objectsList) #заменяем строковые даты на объекты дат
     globalFilters(objectsList) #основная фильтрующая функция
@@ -174,5 +164,3 @@ def __main__():
     # outputDictTerminal(repeatCards)
 
 
-
-__main__()
