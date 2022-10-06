@@ -33,7 +33,8 @@ class OperationData:
         return str(self)
 
 def readJsonFile(objectsList = []):
-    jsonFile = open(f'{os.path.dirname(os.getcwd())}/transactions.json', encoding='utf-8')
+    #jsonFile = open(f'{os.path.dirname(os.getcwd())}/transactions.json', encoding='utf-8')
+    jsonFile = open(f'{os.path.dirname(os.getcwd())}/testdata.json', encoding='utf-8')
     jsonObject = json.load(jsonFile)
     for numberObj, DataObject in enumerate(jsonObject["transactions"]):
         objectValueList = []

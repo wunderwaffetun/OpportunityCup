@@ -13,7 +13,41 @@ def globalFilters(objectsList):
             impossibleValues(object)
             manyCache(object)
     suspiciouslyDeals(repeatCards)
+    checkCorreckDataObject(objectsList, repeatCards)
 
+def findAndReduceByParametr(objectsList, **kwargs): #чисто для фрода, можно поправить уменьшаемое значение (4 пункт)
+    #findAndReduceByParametr(objectsList, card = "56037470176508885939", client = "8-44184") #проверка 4 пункта
+    for key in kwargs.keys(): #пришли ли данные, которых нет в классе: object.akjfdd
+        if key not in objectsList[0].get_properties_name():
+            raise ValueError("There are no such parametr or parametrs P.S. findAndReduceByParametr()")
+    for prop, value in kwargs.items():
+        for object in objectsList:
+            print(object)
+            if getattr(object, prop) == value:
+                object.set_rank(0)
+
+def checkCorreckDataObject(objectsList, repeatCards): #1 пункт
+    for numberCard in repeatCards.keys():
+        if len(repeatCards[numberCard]) > 1:
+            obj = repeatCards[numberCard][0]
+            passport = obj.passport
+            fio = f"{obj.lastName}{obj.firstName}{obj.patronymic}"
+            passportValidTo = obj.passportValidTo
+            accountValidTo = obj.accountValidTo
+            account = obj.account
+            client = obj.client
+            birth = obj.dateOfBirth
+            listOfParametrs = [passport, fio, passportValidTo, accountValidTo, account, client, birth]
+            for i in range(len(repeatCards[numberCard])):
+                object = repeatCards[numberCard][i]
+                listOfCurrentParametrs = [object.passport, f"{object.lastName}{object.firstName}{object.patronymic}",
+                                            object.passportValidTo, object.accountValidTo, object.account,
+                                            object.client, object.dateOfBirth]
+                if listOfCurrentParametrs != listOfParametrs:
+                    findAndReduceByParametr(objectsList, card = object.card, passport = object.passport, lastName = object.lastName,
+                                            firstName = object.firstName, patronymic = object.patronymic,
+                                            passportValidTo = object.passportValidTo, accountValidTo = object.accountValidTo,
+                                            account = object.account, client = object.client, dateOfBirth = object.dateOfBirth)
 def impossibleValues(object):
     yearFromPass = int(f"{object.passport}"[2:4]) #выяснили год пасспорта
     if (yearFromPass > nowYear):
