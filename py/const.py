@@ -20,5 +20,5 @@ limitMaxAge = 120
 limitOperationsByPass = 10
 NextYear = 23
 rank = 100
-fraudOperationValue = 61
+fraudOperationValue = 78
 timeDelta = datetime.timedelta(hours=3) # минимальный промежуток для сниятия
