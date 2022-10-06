@@ -7,6 +7,8 @@ import datetime
 minYearPas = 1996 #c 97 выдача паспорта РФ
 maxYearPas = 2023 #год из серии не превышает нынешний
 maxAge = 100
+timeDelta = datetime.timedelta(hours=3) # минимальный промежуток для сниятия 
+
 class OperationData:
     propertyNames = ['date', 'card', 'account', 'accountValidTo', 'client', 'lastName',
                         'firstName', 'patronymic', 'dateOfBirth', 'passport', 'passportValidTo', 'phone', 
@@ -70,6 +72,7 @@ def objToJson(object):
     return (JSON + '\r\n')
 
 def findAndReduceByParametr(objectsList, **kwargs): #чисто для фрода, можно поправить уменьшаемое значение (4 пункт)
+    #findAndReduceByParametr(objectsList, card = "56037470176508885939", client = "8-44184") #проверка 4 пункта
     for key in kwargs.keys(): 
         if key not in objectsList[0].get_properties_name():
             raise ValueError("There are no such parametr or parametrs P.S. findAndReduceByParametr()")
@@ -138,29 +141,50 @@ def impossibleValues(object):
     if (object.date > object.accountValidTo or object.date > object.passportValidTo):
         reduceRank(object, 10)
 
-def suspiciouslyDeals(object): 
+def manyCache(object):
     if(object.operType == 'Снятие' and object.terminal[0:3] == "ATM" and object.amount > 20000): # если снимаем много налички
         reduceRank(object, 7)
 
+def suspiciouslyDeals(repeatCards): # 3 и более смены мест + промежутки между снятиями небольшие 
+    for numberCard in repeatCards.keys():
+        if len(repeatCards[numberCard]) > 1:
+            isToOften = False
+            isSameOperation = False
+            visitedCities = set()
+            threeChangingCity = False
+            startTime = repeatCards[numberCard][0].date
+            firstOpperation = repeatCards[numberCard][0].operType
+            for i in range(len(repeatCards[numberCard])):
+                object = repeatCards[numberCard][i]
+                visitedCities.add(object.city)
+                if i != 0:
+                    timeDifference = object.date - startTime
+                    if timeDifference.total_seconds() < timeDelta.total_seconds(): isToOften = True
+                    if firstOpperation == object.operType: isSameOperation = True
+                else: timeDifference = None
+                # print(object.city, object.date, object.amount, object.terminal[0:3], object.operType, str(timeDifference), isSameOperation)
+            if (isToOften and isSameOperation): 
+                reduceRank(object, 9) #вектор не уточнён, требуется доработка, потенциальный фрод, при уточнении, недостаточноть входных данных 
+            if len(visitedCities) >= 3:
+                reduceRank(object, 9)
+            #print('-----------------------next---------------------------')
+
 
 def globalFilters(objectsList):
+    repeatCards = repeatCard(objectsList) #получаем список словарей с уникальными ключами в виде номеров карт
     for object in objectsList: 
         if object.get_rank() > 0: #если у нас уже есть в базе фрод, не будем запускать
             impossibleValues(object)
-            suspiciouslyDeals(object)
-        print(object.get_rank()) if (object.get_rank() < 20) else object
-    #findAndReduceByParametr(objectsList, card = "56037470176508885939", client = "8-44184") #проверка 4 пункта
-    # with open('./testFile.txt', 'w+', encoding = 'utf-8') as output:
-    #     for object in objectsList:
-    #         if object.operResult == 'Отказ':
-    #             output.write(objToJson(object))
+            manyCache(object)
+    suspiciouslyDeals(repeatCards)
+
+    
 
 
 if __name__ == '__main__':
     objectsList = readJsonFile([])  #получаем список json объектов
     changeObjDates(objectsList) #заменяем строковые даты на объекты дат
     globalFilters(objectsList) #основная фильтрующая функция
-    repeatCards = repeatCard(objectsList) #получаем список словарей с уникальными ключами в виде номеров карт
-    # outputDictTerminal(repeatCards)
+    
 
 
