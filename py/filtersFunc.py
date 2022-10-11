@@ -19,11 +19,14 @@ def globalFilters(objectsList):
     reduceManyPass(objectsList, listOfPassManyOperrations)
     checkCorreckDataObject(objectsList, repeatCards)
     count = 0
+    exportData = open(f'{os.path.dirname(os.getcwd())}/py/exportData.txt', 'w+', encoding='utf-8')
+    exportData.seek(0)
     for object in objectsList:
         if(object.get_rank() < fraudOperationValue):
             count += 1
-            with open(f'{os.path.dirname(os.getcwd())}/py/exportData.txt', 'a', encoding='utf-8') as exportData:
-                exportData.write(f"{object.get_number()}\n")
+            exportData.write(f"{object.get_number()}\n")
+    exportData.write(f"{count} - всегда")
+    exportData.close()
 
 def findAndReduceByParametr(objectsList, **kwargs): #чисто для фрода, можно поправить уменьшаемое значение (4 пункт)
     #findAndReduceByParametr(objectsList, card = "56037470176508885939", client = "8-44184") #проверка 4 пункта
