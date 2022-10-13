@@ -1,10 +1,8 @@
-import os
-import json
-import re
-from const import *
-from filtersFunc import *
+from config import *
+from filtersFunctions import *
 from readJSON import *
-from Script import *
+from main import *
+
 def repeatCard(objectsList):
     sameCards = dict()
     for object in objectsList:

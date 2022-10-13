@@ -1,32 +1,8 @@
-import os
-import json
-import re
-from const import *
+from config import *
 from readJSON import *
-from dopFunction import *
-from Script import *
+from additionalFunctions import *
+from main import *
 from frodForPas import *
-
-def globalFilters(objectsList):
-    repeatCards = repeatCard(objectsList) #получаем список словарей с уникальными ключами в виде номеров карт
-    repeatPassports = repeatPassport(objectsList)
-    for object in objectsList:
-        if object.get_rank() > 0: #если у нас уже есть в базе фрод, не будем запускать
-            impossibleValues(object)
-            manyCache(object)
-    suspiciouslyDeals(repeatCards)
-    listOfPassManyOperrations = suspiciouslyDealsTwo(repeatPassports)
-    reduceManyPass(objectsList, listOfPassManyOperrations)
-    checkCorreckDataObject(objectsList, repeatCards)
-    count = 0
-    exportData = open(f'{os.path.dirname(os.getcwd())}/py/exportData.txt', 'w+', encoding='utf-8')
-    exportData.seek(0)
-    for object in objectsList:
-        if(object.get_rank() < fraudOperationValue):
-            count += 1
-            exportData.write(f"{object.get_number()}\n")
-    exportData.write(f"{count} - всегда")
-    exportData.close()
 
 def findAndReduceByParametr(objectsList, **kwargs): #чисто для фрода, можно поправить уменьшаемое значение (4 пункт)
     #findAndReduceByParametr(objectsList, card = "56037470176508885939", client = "8-44184") #проверка 4 пункта
@@ -87,6 +63,7 @@ def impossibleValues(object):
 
     if (object.date > object.accountValidTo or object.date > object.passportValidTo):
         reduceRank(object, penaltyForValidTo)
+
 def manyCache(object):
     if(object.operType == 'Снятие' and object.terminal[0:3] == "ATM" and object.amount > limitWithdrawalATM): # если снимаем много налички
         reduceRank(object, penaltyForWithdrawalATM)
@@ -108,7 +85,6 @@ def suspiciouslyDeals(repeatCards): # 3 и более смены мест + пр
                     if timeDifference.total_seconds() < timeDelta.total_seconds(): isToOften = True
                     if firstOpperation == object.operType: isSameOperation = True
                 else: timeDifference = None
-
             if (isToOften and isSameOperation):
                 reduceRank(object, penaltyForSameOftenOperationCart) #вектор не уточнён, требуется доработка, потенциальный фрод, при уточнении, недостаточноть входных данных
             if len(visitedCities) > limitCountVisitedCities:

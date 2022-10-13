@@ -1,10 +1,10 @@
 import os
 import json
 import re
-from const import *
-from Script import *
-from filtersFunc import *
-from dopFunction import *
+from config import *
+from main import *
+from filtersFunctions import *
+from additionalFunctions import *
 
 class OperationData:
     propertyNames = ['date', 'card', 'account', 'accountValidTo', 'client', 'lastName',

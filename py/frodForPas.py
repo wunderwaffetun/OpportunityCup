@@ -1,11 +1,9 @@
-import os
-import json
-import re
-from const import *
-from filtersFunc import *
+
+from config import *
+from filtersFunctions import *
 from readJSON import *
-from dopFunction import *
-from Script import *
+from additionalFunctions import *
+from main import *
 
 def repeatPassport(objectsList):
     samePassports = dict()
@@ -16,13 +14,13 @@ def repeatPassport(objectsList):
             samePassports[object.passport].append(object)
     return samePassports
 
-def reduceManyPass(objectsList, listOfPassoprtWhereTooManyOperations):
+def reduceForManyPassportsOperations(objectsList, listOfPassoprtWhereTooManyOperations):
     for object in objectsList:
         if object.passport in listOfPassoprtWhereTooManyOperations:
             reduceRank(object, penaltyForSameOftenOperationPas)
 
 
-def suspiciouslyDealsTwo(repeatPassports): # 3 и более смены мест + промежутки между снятиями небольшие
+def manyOperationsByOnePass(repeatPassports): # 3 и более смены мест + промежутки между снятиями небольшие
     listOfPassoprtWhereTooManyOperations = []
     for key in repeatPassports.keys():
         if len(repeatPassports[key]) > limitOperationsByPass:
