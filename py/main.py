@@ -17,6 +17,9 @@ def globalFilters(objectsList):
     reduceForManyPassportsOperations(objectsList, listOfPassManyOperrations)
     checkCorreckDataObject(objectsList, repeatCards)
     exportToFile(objectsList)
+    for object in objectsList:
+        print(object.fraudPatterns)
+        break
     
 
 if __name__ == '__main__':

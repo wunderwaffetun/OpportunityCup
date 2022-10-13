@@ -33,10 +33,10 @@ def outputDictTerminal(dict):
 
 
 
-def definePattern(currentFraudPattern):
+def definePattern(currentFraudPattern, object):
     currentFraudPattern = currentFraudPattern.strip()
     if(currentFraudPattern):
-        pass
+        object.set_fraud_patterns(currentFraudPattern)
 
 def findAndReduceByParametr(objectsList, **kwargs): #чисто для фрода, можно поправить уменьшаемое значение (4 пункт)
     #findAndReduceByParametr(objectsList, card = "56037470176508885939", client = "8-44184") #проверка 4 пункта

@@ -10,7 +10,7 @@ class OperationData:
     propertyNames = ['date', 'card', 'account', 'accountValidTo', 'client', 'lastName',
                         'firstName', 'patronymic', 'dateOfBirth', 'passport', 'passportValidTo', 'phone',
                         'operType', 'amount', 'operResult', 'terminal', 'terminalType', 'city', 'address']
-    fraudPatterns = []
+    fraudPatterns = set()
     def __init__(self, objectValueList, number):
         self._numberOperation = number
         self._rank = rank
@@ -24,7 +24,7 @@ class OperationData:
     def get_number(self):
         return self._numberOperation
     def set_fraud_patterns(self, pattern):
-        self.fraudPatterns.append(pattern)
+        self.fraudPatterns.add(pattern)
     def toJSON(self):
         return json.dumps(self, default = lambda o: f"{o.__dict__}", indent = 2)
     def set_rank(self, rank):
