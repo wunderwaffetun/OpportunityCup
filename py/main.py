@@ -1,10 +1,11 @@
 from config import *
-from filtersFunctions import *
+from generalFunctions import *
 from readJSON import *
 from additionalFunctions import *
 from exportData import *
 
 def globalFilters(objectsList):
+    
     repeatCards = repeatCard(objectsList) #получаем список словарей с уникальными ключами в виде номеров карт
     repeatPassports = repeatPassport(objectsList)
     for object in objectsList:

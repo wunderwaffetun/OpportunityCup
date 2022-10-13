@@ -3,13 +3,14 @@ import json
 import re
 from config import *
 from main import *
-from filtersFunctions import *
+from generalFunctions import *
 from additionalFunctions import *
 
 class OperationData:
     propertyNames = ['date', 'card', 'account', 'accountValidTo', 'client', 'lastName',
                         'firstName', 'patronymic', 'dateOfBirth', 'passport', 'passportValidTo', 'phone',
                         'operType', 'amount', 'operResult', 'terminal', 'terminalType', 'city', 'address']
+    fraudPatterns = []
     def __init__(self, objectValueList, number):
         self._numberOperation = number
         self._rank = rank
@@ -22,6 +23,8 @@ class OperationData:
                 setattr(self, key, value)
     def get_number(self):
         return self._numberOperation
+    def set_fraud_patterns(self, pattern):
+        self.fraudPatterns.append(pattern)
     def toJSON(self):
         return json.dumps(self, default = lambda o: f"{o.__dict__}", indent = 2)
     def set_rank(self, rank):

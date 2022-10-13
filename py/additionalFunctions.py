@@ -1,5 +1,5 @@
 from config import *
-from filtersFunctions import *
+from generalFunctions import *
 from readJSON import *
 from main import *
 
@@ -24,6 +24,11 @@ def outputDictTerminal(dict):
                     print(item, val)
 
 
+
+def definePattern(currentFraudPattern):
+    currentFraudPattern = currentFraudPattern.strip()
+    if(currentFraudPattern):
+        pass
 
 def findAndReduceByParametr(objectsList, **kwargs): #чисто для фрода, можно поправить уменьшаемое значение (4 пункт)
     #findAndReduceByParametr(objectsList, card = "56037470176508885939", client = "8-44184") #проверка 4 пункта

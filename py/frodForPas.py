@@ -1,6 +1,6 @@
 
 from config import *
-from filtersFunctions import *
+from generalFunctions import *
 from readJSON import *
 from additionalFunctions import *
 from main import *
