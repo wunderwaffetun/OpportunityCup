@@ -3,16 +3,8 @@ from readJSON import *
 from additionalFunctions import *
 from main import *
 from frodForPas import *
+definePattern(currentFraudPattern)
 
-def findAndReduceByParametr(objectsList, **kwargs): #чисто для фрода, можно поправить уменьшаемое значение (4 пункт)
-    #findAndReduceByParametr(objectsList, card = "56037470176508885939", client = "8-44184") #проверка 4 пункта
-    for key in kwargs.keys(): #пришли ли данные, которых нет в классе: object.akjfdd
-        if key not in objectsList[0].get_properties_name():
-            raise ValueError("There are no such parametr or parametrs P.S. findAndReduceByParametr()")
-    for prop, value in kwargs.items():
-        for object in objectsList:
-            if getattr(object, prop) == value:
-                object.set_rank(0)
 
 def checkCorreckDataObject(objectsList, repeatCards): #1 пункт
     for numberCard in repeatCards.keys():
