@@ -3,8 +3,6 @@ from readJSON import *
 from additionalFunctions import *
 from main import *
 from frodForPas import *
-definePattern(currentFraudPattern)
-
 
 def checkCorreckDataObject(objectsList, repeatCards): #1 пункт
     for numberCard in repeatCards.keys():
@@ -80,4 +78,5 @@ def suspiciouslyDeals(repeatCards): # 3 и более смены мест + пр
             if (isToOften and isSameOperation):
                 reduceRank(object, penaltyForSameOftenOperationCart) #вектор не уточнён, требуется доработка, потенциальный фрод, при уточнении, недостаточноть входных данных
             if len(visitedCities) > limitCountVisitedCities:
+                
                 reduceRank(object, penaltyForVisetedCities)
