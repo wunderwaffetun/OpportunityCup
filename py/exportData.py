@@ -14,5 +14,6 @@ def exportToFile(objectsList):
         if(object.get_rank() < fraudOperationValue):
             count += 1
             exportData.write(f"{object.get_number()}\n")
+            # exportData.write(f"{object.fraudPatterns}")
     exportData.write(f"{count} - всего")
     exportData.close()

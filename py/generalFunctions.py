@@ -22,6 +22,7 @@ def checkCorreckDataObject(objectsList, repeatCards): #1 пункт
                                             object.passportValidTo, object.accountValidTo, object.account,
                                             object.client, object.dateOfBirth]
                 if listOfCurrentParametrs != listOfParametrs:
+                    incorrectData("DIFFERENT_DATA_WITH_ONE_CARD", object)
                     findAndReduceByParametr(objectsList, card = object.card, passport = object.passport, lastName = object.lastName,
                                             firstName = object.firstName, patronymic = object.patronymic,
                                             passportValidTo = object.passportValidTo, accountValidTo = object.accountValidTo,
@@ -51,10 +52,11 @@ def impossibleValues(object):
         ageClient < limitMinAgeForPas or                                    # ранняя выдача паспорта
         ageCalculateFromPas < (limitMinAgeForPas - deltaSiriesInYearIssuance) or                          # слишком молод для своей серии
         ageClient > limitMaxAge):
+        incorrectData("INCORRECT_CLIENT_AGE", object)
         reduceRank(object, penaltyForPasError)
 
     if (object.date > object.accountValidTo or object.date > object.passportValidTo):
-        definePattern('PASSPORT_OR_ACCOUNT_INCORRECT', object)
+        definePattern('PASSPORT_OR_ACCOUNT_NO_VALID', object)
         reduceRank(object, penaltyForValidTo)
 
 def manyCache(object):
@@ -81,7 +83,7 @@ def suspiciouslyDeals(repeatCards): # 3 и более смены мест + пр
                 else: timeDifference = None
             if (isToOften and isSameOperation):
                 reduceRank(object, penaltyForSameOftenOperationCart) #вектор не уточнён, требуется доработка, потенциальный фрод, при уточнении, недостаточноть входных данных
-                definePattern('OFTEN_OPERATIONS', object)
+                definePattern('OFTEN_SAME_OPERATIONS', object)
             if len(visitedCities) > limitCountVisitedCities:    
                 reduceRank(object, penaltyForVisetedCities)
                 definePattern('OFTEN_CHANGE_CITY', object)

@@ -8,7 +8,7 @@ penaltyForWithdrawalATM = 9
 penaltyForRefillPOS = 11
 penaltyForVisetedCities = 13
 penaltyForValidTo = 17
-penaltyForPasError = 23
+penaltyForPasError = 2
 
 deltaSiriesInYearIssuance = 3
 limitMinAgeForPas = 14

@@ -20,7 +20,8 @@ def findAndReduceByParametr(objectsList, **kwargs): #чисто для фрод�
     for prop, value in kwargs.items():
         for object in objectsList:
             if getattr(object, prop) == value:
-                object.set_rank(0)
+                # object.set_rank(0)
+                reduceRank(object, penaltyForPasError)
 
 def outputDictTerminal(dict):
     for key, value in dict.items():
@@ -37,6 +38,11 @@ def definePattern(currentFraudPattern, object):
     currentFraudPattern = currentFraudPattern.strip()
     if(currentFraudPattern):
         object.set_fraud_patterns(currentFraudPattern)
+
+def incorrectData(currentIncorrectData, object):
+    currentIncorrectData = currentIncorrectData.strip()
+    if(currentIncorrectData):
+        object.set_incorrect_data(currentIncorrectData)
 
 def findAndReduceByParametr(objectsList, **kwargs): #чисто для фрода, можно поправить уменьшаемое значение (4 пункт)
     #findAndReduceByParametr(objectsList, card = "56037470176508885939", client = "8-44184") #проверка 4 пункта

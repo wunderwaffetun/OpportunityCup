@@ -18,8 +18,8 @@ def globalFilters(objectsList):
     checkCorreckDataObject(objectsList, repeatCards)
     exportToFile(objectsList)
     for object in objectsList:
-        print(object.fraudPatterns)
-        break
+        if(len(object.get_incorrect_data())>0):
+            print(object.get_incorrect_data(), object.get_rank(), object.card, "main.py")
     
 
 if __name__ == '__main__':
