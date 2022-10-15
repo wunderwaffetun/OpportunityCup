@@ -5,7 +5,7 @@ from main import *
 from frodForPas import *
 def checkCorreckDataObject(objectsList, repeatCards): #1 пункт
     for numberCard in repeatCards.keys():
-        if len(repeatCards[numberCard]) > 1:
+        if len(repeatCards[numberCard]) > quantityOperationsByOneCardOrPass:
             obj = repeatCards[numberCard][0]
             passport = obj.passport
             fio = f"{obj.lastName}{obj.firstName}{obj.patronymic}"
@@ -40,6 +40,7 @@ def impossibleValueYearFromPas(object):#проверка корректност�
         ageCalculateFromPas < (limitMinAgeForPas - deltaSiriesInYearIssuance) or                          # слишком молод для своей серии
         ageClient > limitMaxAge):
         incorrectData("INCORRECT_CLIENT_AGE", object)
+        definePattern('INCORRECT_CLIENT_AGE', object)
         reduceRank(object, penaltyForPasError)
 def frodRrefillPOS (object):
     terminal = object.terminal[0:3]
@@ -51,7 +52,7 @@ def frodNightTime (object):
         (object.date.time() <= strToTime("23:59:59"))) or
         ((object.date.time() >= strToTime("00:00:00")) and
         (object.date.time() <= strToTime("06:00:00")))):
-        reduceRank(object, penaltyForRefillPOS)
+        reduceRank(object, penaltyForNightTime)
         definePattern('NIGHT_TIME', object)
 def frodValidTo (object):
     if (object.date > object.accountValidTo or object.date > object.passportValidTo):
@@ -65,7 +66,7 @@ def suspiciouslyDeals(repeatCards): # 3 и более смены мест + пр
     for numberCard in repeatCards.keys():
         if len(repeatCards[numberCard]) > 1:
             isToOften = False
-            isSameOperation = False
+            isSameOperation = not includeSameOperations
             visitedCities = set()
             threeChangingCity = False
             startTime = repeatCards[numberCard][0].date
@@ -79,6 +80,7 @@ def suspiciouslyDeals(repeatCards): # 3 и более смены мест + пр
                     if firstOpperation == object.operType: isSameOperation = True
                 else: timeDifference = None
             if (isToOften and isSameOperation):
+                print(len(repeatCards[numberCard]))
                 reduceRank(object, penaltyForSameOftenOperationCart) #вектор не уточнён, требуется доработка, потенциальный фрод, при уточнении, недостаточноть входных данных
                 definePattern('OFTEN_SAME_OPERATIONS', object)
             if len(visitedCities) > limitCountVisitedCities:    
