@@ -10,7 +10,10 @@ def globalFilters(objectsList):
     repeatPassports = repeatPassport(objectsList)
     for object in objectsList:
         if object.get_rank() > 0: #если у нас уже есть в базе фрод, не будем запускать
-            impossibleValues(object)
+            impossibleValueYearFromPas(object)
+            frodRrefillPOS(object)
+            frodNightTime(object)
+            frodValidTo(object)
             manyCache(object)
     suspiciouslyDeals(repeatCards)
     listOfPassManyOperrations = manyOperationsByOnePass(repeatPassports)

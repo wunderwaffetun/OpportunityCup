@@ -3,7 +3,6 @@ from readJSON import *
 from additionalFunctions import *
 from main import *
 from frodForPas import *
-
 def checkCorreckDataObject(objectsList, repeatCards): #1 пункт
     for numberCard in repeatCards.keys():
         if len(repeatCards[numberCard]) > 1:
@@ -27,26 +26,14 @@ def checkCorreckDataObject(objectsList, repeatCards): #1 пункт
                                             firstName = object.firstName, patronymic = object.patronymic,
                                             passportValidTo = object.passportValidTo, accountValidTo = object.accountValidTo,
                                             account = object.account, client = object.client, dateOfBirth = object.dateOfBirth)
-def impossibleValues(object):
+def impossibleValueYearFromPas(object):#проверка корректности серрии паспорта и возраста клиента
     yearFromPass = int(f"{object.passport}"[2:4]) #выяснили год пасспорта
     if (yearFromPass > NextYear):
         yearFromPass = int("19"+f"{object.passport}"[2:4])
     else:
         yearFromPass = int("20"+f"{object.passport}"[2:4])
-    terminal = object.terminal[0:3]
-    ageClient = object.date.year - object.dateOfBirth.year #реальный возраст клиента на момент итерации с банком
-    ageCalculateFromPas = yearFromPass - object.dateOfBirth.year #возраст клиента на момент получения паспорта
-    if(terminal == "POS" and object.operType == "Пополнение"):#пополнение через POS
-        reduceRank(object, penaltyForRefillPOS)
-        definePattern('POS_TERMINAL', object)
-
-    if(((object.date.time() >= strToTime("22:00:00")) and #ночное время
-        (object.date.time() <= strToTime("23:59:59"))) or
-        ((object.date.time() >= strToTime("00:00:00")) and
-        (object.date.time() <= strToTime("06:00:00")))):
-        reduceRank(object, penaltyForRefillPOS)
-        definePattern('NIGHT_TIME', object)
-
+    ageClient = object.date.year - object.dateOfBirth.year  # реальный возраст клиента на момент итерации с банком
+    ageCalculateFromPas = yearFromPass - object.dateOfBirth.year  # возраст клиента на момент получения паспорта
     if(yearFromPass < limitMinYearPas or
         yearFromPass > limitMaxYearPas or                          # несуществующая серия паспорта
         ageClient < limitMinAgeForPas or                                    # ранняя выдача паспорта
@@ -54,16 +41,26 @@ def impossibleValues(object):
         ageClient > limitMaxAge):
         incorrectData("INCORRECT_CLIENT_AGE", object)
         reduceRank(object, penaltyForPasError)
-
+def frodRrefillPOS (object):
+    terminal = object.terminal[0:3]
+    if(terminal == "POS" and object.operType == "Пополнение"):#пополнение через POS
+        reduceRank(object, penaltyForRefillPOS)
+        definePattern('POS_TERMINAL', object)
+def frodNightTime (object):
+    if(((object.date.time() >= strToTime("22:00:00")) and #ночное время
+        (object.date.time() <= strToTime("23:59:59"))) or
+        ((object.date.time() >= strToTime("00:00:00")) and
+        (object.date.time() <= strToTime("06:00:00")))):
+        reduceRank(object, penaltyForRefillPOS)
+        definePattern('NIGHT_TIME', object)
+def frodValidTo (object):
     if (object.date > object.accountValidTo or object.date > object.passportValidTo):
         definePattern('PASSPORT_OR_ACCOUNT_NO_VALID', object)
         reduceRank(object, penaltyForValidTo)
-
 def manyCache(object):
-    if(object.operType == 'Снятие' and object.terminal[0:3] == "ATM" and object.amount > limitWithdrawalATM): # если снимаем много налички
+    if(object.operType == 'Сgiнятие' and object.terminal[0:3] == "ATM" and object.amount > limitWithdrawalATM): # если снимаем много налички
         reduceRank(object, penaltyForWithdrawalATM)
         definePattern('CASH_OUT_ATM_TERMINAL', object)
-
 def suspiciouslyDeals(repeatCards): # 3 и более смены мест + промежутки между снятиями небольшие
     for numberCard in repeatCards.keys():
         if len(repeatCards[numberCard]) > 1:
