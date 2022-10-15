@@ -58,7 +58,7 @@ def frodValidTo (object):
         definePattern('PASSPORT_OR_ACCOUNT_NO_VALID', object)
         reduceRank(object, penaltyForValidTo)
 def manyCache(object):
-    if(object.operType == 'Сgiнятие' and object.terminal[0:3] == "ATM" and object.amount > limitWithdrawalATM): # если снимаем много налички
+    if(object.operType == 'Снятие' and object.terminal[0:3] == "ATM" and object.amount > limitWithdrawalATM): # если снимаем много налички
         reduceRank(object, penaltyForWithdrawalATM)
         definePattern('CASH_OUT_ATM_TERMINAL', object)
 def suspiciouslyDeals(repeatCards): # 3 и более смены мест + промежутки между снятиями небольшие
