@@ -1,33 +1,21 @@
 from config import *
+from config import firstStartFunctionDeals
 from readJSON import *
 from additionalFunctions import *
 from main import *
-from frodForPas import *
 
 
-def checkCorreckDataObject(objectsList, repeatCards): #1 пункт
-    for numberCard in repeatCards.keys():
-        if len(repeatCards[numberCard]) > quantityOperationsByOneCardOrPass:
-            obj = repeatCards[numberCard][0]
-            passport = obj.passport
-            fio = f"{obj.lastName}{obj.firstName}{obj.patronymic}"
-            passportValidTo = obj.passportValidTo
-            accountValidTo = obj.accountValidTo
-            account = obj.account
-            client = obj.client
-            birth = obj.dateOfBirth
-            listOfParametrs = [passport, fio, passportValidTo, accountValidTo, account, client, birth]
-            for i in range(len(repeatCards[numberCard])):
-                object = repeatCards[numberCard][i]
-                listOfCurrentParametrs = [object.passport, f"{object.lastName}{object.firstName}{object.patronymic}",
-                                            object.passportValidTo, object.accountValidTo, object.account,
-                                            object.client, object.dateOfBirth]
+def checkCorreckDataObjects(objectsList, repeatParametrs, listCheckAttributes): #1 пункт
+    for numberParametr in repeatParametrs.keys():
+        if len(repeatParametrs[numberParametr]) > quantityOperationsByOneCardOrPass:
+            obj = repeatParametrs[numberParametr][0]
+            listOfParametrs = [getattr(obj, par) for par in listCheckAttributes]
+            for i in range(len(repeatParametrs[numberParametr])):
+                object = repeatParametrs[numberParametr][i]
+                listOfCurrentParametrs = [getattr(object, param) for param in listCheckAttributes]
                 if listOfCurrentParametrs != listOfParametrs:
-                    incorrectData("DIFFERENT_DATA_WITH_ONE_CARD", object)
-                    findAndReduceByParametr(objectsList, card = object.card, passport = object.passport, lastName = object.lastName,
-                                            firstName = object.firstName, patronymic = object.patronymic,
-                                            passportValidTo = object.passportValidTo, accountValidTo = object.accountValidTo,
-                                            account = object.account, client = object.client, dateOfBirth = object.dateOfBirth)
+                    incorrectData("DIFFERENT_DATA", object)
+                    findAndReduceByParametr(objectsList, card = object.card, passport = object.passport)
 
 
 def impossibleValueYearFromPas(object):#проверка корректности серрии паспорта и возраста клиента
@@ -44,7 +32,6 @@ def impossibleValueYearFromPas(object):#проверка корректност�
         ageCalculateFromPas < (limitMinAgeForPas - deltaSiriesInYearIssuance) or                          # слишком молод для своей серии
         ageClient > limitMaxAge):
         incorrectData("INCORRECT_CLIENT_AGE", object)
-        definePattern('INCORRECT_CLIENT_AGE', object)
         reduceRank(object, penaltyForPasError)
 
 
@@ -73,15 +60,16 @@ def manyCache(object):
         definePattern('CASH_OUT_ATM_TERMINAL', object)
 
 def suspiciouslyDeals(repeatParametrs): # 3 и более смены мест + промежутки между снятиями небольшие
-    for numberCard in repeatParametrs.keys():
-        if len(repeatParametrs[numberCard]) > 1:
+    global firstStartFunctionDeals
+    for numberParametr in repeatParametrs.keys():
+        if len(repeatParametrs[numberParametr]) > 1:
             isToOften = False
             isSameOperation = not includeSameOperations
             visitedCities = set()
-            startTime = repeatParametrs[numberCard][0].date
-            firstOpperation = repeatParametrs[numberCard][0].operType
-            for i in range(len(repeatParametrs[numberCard])):
-                object = repeatParametrs[numberCard][i]
+            startTime = repeatParametrs[numberParametr][0].date
+            firstOpperation = repeatParametrs[numberParametr][0].operType
+            for i in range(len(repeatParametrs[numberParametr])):
+                object = repeatParametrs[numberParametr][i]
                 visitedCities.add(object.city)
                 if i != 0:
                     timeDifference = object.date - startTime
@@ -89,9 +77,9 @@ def suspiciouslyDeals(repeatParametrs): # 3 и более смены мест + 
                     if firstOpperation == object.operType: isSameOperation = True
                 else: timeDifference = None
             if (isToOften and isSameOperation):
-                print(len(repeatParametrs[numberCard]))
                 reduceRank(object, penaltyForSameOftenOperationCart) #вектор не уточнён, требуется доработка, потенциальный фрод, при уточнении, недостаточноть входных данных
                 definePattern('OFTEN_SAME_OPERATIONS', object)
-            if len(visitedCities) > limitCountVisitedCities:    
+            if (len(visitedCities) > limitCountVisitedCities) and firstStartFunctionDeals: 
                 reduceRank(object, penaltyForVisetedCities)
                 definePattern('OFTEN_CHANGE_CITY', object)
+    firstStartFunctionDeals = False

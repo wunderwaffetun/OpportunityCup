@@ -3,14 +3,16 @@ from generalFunctions import *
 from readJSON import *
 from main import *
 
-def repeatCard(objectsList):
-    sameCards = dict()
+def createRepeatDictByKey(objectsList, repeatByWhat):
+    singleDict = dict()
     for object in objectsList:
-        if object.card not in sameCards:
-            sameCards.update({object.card: [object]})
+        if getattr(object, repeatByWhat) not in singleDict:
+            singleDict.update({getattr(object, repeatByWhat): [object]})
         else:
-            sameCards[object.card].append(object)
-    return sameCards
+            singleDict[getattr(object, repeatByWhat)].append(object)
+    return singleDict
+
+
 
 def findAndReduceByParametr(objectsList, **kwargs): #чисто для фрода, можно поправить уменьшаемое значение (4 пункт)
     #findAndReduceByParametr(objectsList, card = "56037470176508885939", client = "8-44184") #проверка 4 пункта
@@ -20,13 +22,13 @@ def findAndReduceByParametr(objectsList, **kwargs): #чисто для фрод�
     for prop, value in kwargs.items():
         for object in objectsList:
             if getattr(object, prop) == value:
-                # object.set_rank(0)
                 reduceRank(object, penaltyForPasError)
+                
 
-def outputDictTerminal(dict):
+def outputBigDictTerminal(dict):
     for key, value in dict.items():
         if(len(value) >= 1):
-            print( '\n\n', '----------next-------------', '\n\n', 'Количество повторяющихся операций:', len(value))
+            print( key, '\n\n', '----------next-------------', '\n\n', 'Количество повторяющихся операций:', len(value))
             for operation in value:
                 print('\n')
                 for item, val in operation.__dict__.items():
@@ -53,6 +55,7 @@ def findAndReduceByParametr(objectsList, **kwargs): #чисто для фрод�
         for property, value in kwargs.items():
             if getattr(object, property) == value:
                 reduceRank(object, 30)
+                incorrectData("DIFFERENT_DATA", object)
 
 def reduceRank(object, quantity): #универсальная функция, уменьшающая приоритетность операции
     #Здесь мы смотрим на operResult, это нужно, чтобы, например, если человек забыл, что просрочился

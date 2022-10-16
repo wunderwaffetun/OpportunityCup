@@ -13,7 +13,7 @@ def exportToFile(objectsList):
     for object in objectsList:
         if(object.get_rank() < fraudOperationValue):
             count += 1
-            exportData.write(f"{object.get_number()}\n")
+            exportData.write(f"{object.get_number()} {object.get_fraud_patterns() if object.get_fraud_patterns() != set() else 'Нет паттернов'} {object.get_incorrect_data() if object.get_incorrect_data() != set() else 'Нет ошибок'} {object.get_rank()}\n")
             # exportData.write(f"{object.fraudPatterns}")
     exportData.write(f"{count} - всего")
     exportData.close()
