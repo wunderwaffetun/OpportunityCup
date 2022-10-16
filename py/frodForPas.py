@@ -12,10 +12,14 @@ def repeatPassport(objectsList):
         else:
             samePassports[object.passport].append(object)
     return samePassports
+
+
 def reduceForManyPassportsOperations(objectsList, listOfPassoprtWhereTooManyOperations):
     for object in objectsList:
         if object.passport in listOfPassoprtWhereTooManyOperations:
             reduceRank(object, penaltyForSameOftenOperationPas)
+
+            
 def manyOperationsByOnePass(repeatPassports): # 3 и более смены мест + промежутки между снятиями небольшие
     listOfPassoprtWhereTooManyOperations = []
     for key in repeatPassports.keys():

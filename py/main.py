@@ -7,6 +7,7 @@ from exportData import *
 def globalFilters(objectsList):
     
     repeatCards = repeatCard(objectsList) #получаем список словарей с уникальными ключами в виде номеров карт
+    
     repeatPassports = repeatPassport(objectsList)
     for object in objectsList:
         if object.get_rank() > 0: #если у нас уже есть в базе фрод, не будем запускать
@@ -20,10 +21,10 @@ def globalFilters(objectsList):
     reduceForManyPassportsOperations(objectsList, listOfPassManyOperrations)
     checkCorreckDataObject(objectsList, repeatCards)
     exportToFile(objectsList)
-    for object in objectsList:
-        if(len(object.get_incorrect_data())>=0):
+    # for object in objectsList:
+        # if(len(object.get_incorrect_data())>=0):
         # if(len(object.get_fraud_patterns())>0):
-            print(object.get_incorrect_data(), object.get_rank(), object.card, "main.py")
+            # print(object.get_incorrect_data(), object.get_rank(), object.card, "main.py")
             # print(object.get_fraud_patterns(), object.get_rank(), object.card, "main.py")
     
 
