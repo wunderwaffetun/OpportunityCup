@@ -26,3 +26,7 @@ rank = 100
 includeSameOperations = False #учитываем что операции одинаковые (для фрода)
 fraudOperationValue = 78 #с какого ранга мы считаем людей мошенниками 
 timeDelta = datetime.timedelta(hours=24) # минимальный промежуток для сниятия
+
+link = ['https://www.googleapis.com/auth/spreadsheets']#права  на работу с таблицей
+idLink = '1kRN1VcA99_12FRJSDLhqwpqzPPY3WXzp_BPTFqF_OG4'#id таблицы (/d/*оно_самое*/edit)
+data = 'TestList!A2:G7'#с какими данными работаем (книга и ячейки)
