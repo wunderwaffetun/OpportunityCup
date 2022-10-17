@@ -35,13 +35,13 @@ def impossibleValueYearFromPas(object):#проверка корректност�
         reduceRank(object, penaltyForPasError)
 
 
-def frodRrefillPOS (object):
+def FraudRrefillPOS (object):
     terminal = object.terminal[0:3]
     if(terminal == "POS" and object.operType == "Пополнение"):#пополнение через POS
         reduceRank(object, penaltyForRefillPOS)
         definePattern('POS_TERMINAL', object)
 
-def frodNightTime (object):
+def FraudNightTime (object):
     if(((object.date.time() >= strToTime("22:00:00")) and #ночное время
         (object.date.time() <= strToTime("23:59:59"))) or
         ((object.date.time() >= strToTime("00:00:00")) and
@@ -49,7 +49,7 @@ def frodNightTime (object):
         reduceRank(object, penaltyForNightTime)
         definePattern('NIGHT_TIME', object)
 
-def frodValidTo (object):
+def FraudValidTo (object):
     if (object.date > object.accountValidTo or object.date > object.passportValidTo):
         definePattern('PASSPORT_OR_ACCOUNT_NO_VALID', object)
         reduceRank(object, penaltyForValidTo)

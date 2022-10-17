@@ -44,7 +44,7 @@ class GoogleSheet:
         }
         result = self.service.spreadsheets().values().batchUpdate(spreadsheetId=self.SPREADSHEET_ID,
                                                                   body=body).execute()
-        print('{0} cells updated.'.format(result.get('totalUpdatedCells')))
+        #print('{0} cells updated.'.format(result.get('totalUpdatedCells')))
 
 
 def importToSheet(range,values):

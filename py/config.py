@@ -1,7 +1,7 @@
 import datetime
 
 penaltyForNightTime = 3
-penaltyForRejectionAndFrod = 3
+penaltyForRejectionAndFraud = 3
 penaltyForSameOftenOperationPas = 30 #Новый паттерн 
 penaltyForSameOftenOperationCart = 7
 penaltyForWithdrawalATM = 9

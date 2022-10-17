@@ -63,7 +63,7 @@ def reduceRank(object, quantity): #универсальная функция, у
     if(object.operResult != "Отказ"):
         object.set_rank(object.get_rank() - quantity)
     else:
-        object.set_rank(object.get_rank() - penaltyForRejectionAndFrod)
+        object.set_rank(object.get_rank() - penaltyForRejectionAndFraud)
     if object.get_rank() < 0:
         object.set_rank(0)
 def strToTime(strTime): #универсальная функция, переводит строку во время
