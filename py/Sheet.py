@@ -6,10 +6,10 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from config import *
-SAMPLE_RANGE_NAME = data
 
 
 class GoogleSheet:
+
     SPREADSHEET_ID = idLink
     SCOPES = link
     service = None
@@ -34,19 +34,26 @@ class GoogleSheet:
         self.service = build('sheets', 'v4', credentials=creds)
 
     def updateRangeValues(self, range, values):
-        data = [{
+        dataForUpdate = [{
             'range': range,
             'values': values
         }]
-        body = {
+        bodyForUpdate = {
             'valueInputOption': 'USER_ENTERED',
-            'data': data
+            'data': dataForUpdate
         }
-        result = self.service.spreadsheets().values().batchUpdate(spreadsheetId=self.SPREADSHEET_ID,
-                                                                  body=body).execute()
-        #print('{0} cells updated.'.format(result.get('totalUpdatedCells')))
+        result = self.service.spreadsheets().values().batchUpdate(spreadsheetId = self.SPREADSHEET_ID,
+                                                                  body = bodyForUpdate).execute()
+    
+    def clearAllSheet(self):
+        rangeAll = 'List1!A1:Z'.format(self.SCOPES)
+        bodyForClear = {}
+        resultClear = self.service.spreadsheets().values().clear(spreadsheetId = self.SPREADSHEET_ID, range = rangeAll,
+                                                       body = bodyForClear).execute()
 
 
 def importToSheet(range,values):
-    gs = GoogleSheet()
-    gs.updateRangeValues(range, values)
+    GoogleSheet().updateRangeValues(range, values)
+
+def clearingSheet():
+    GoogleSheet().clearAllSheet()
